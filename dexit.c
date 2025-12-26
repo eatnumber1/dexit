@@ -2,7 +2,9 @@
 // Author: Russell Harmon <russ@har.mn>
 // License: MIT
 //
+#define _GNU_SOURCE
 #include <assert.h>
+#include <ctype.h>
 #include <libgen.h>
 #include <string.h>
 #include <ctype.h>
@@ -183,7 +185,8 @@ static void ValidateFlagsOrDie(Flags flags) {
   }
 }
 
-static bool IsSignalExit(int status) {
+// Returns -1 if the status is not a signal number.
+static int ExitStatusToSignalNumber(int status) {
   // Per https://www.gnu.org/software/bash/manual/bash.html#Exit-Status
   //
   // > When a command terminates on a fatal signal whose number is N, Bash uses
@@ -199,12 +202,15 @@ static bool IsSignalExit(int status) {
   // Note: This does *not* mean that a command definitely exited with a signal.
   // Commands are allowed to exit with a return code in the range [128,255]
   // without a signal. E.g. `bash -c 'exit 129'`, which is not detectable.
-  return status >= 128;
+  if (status <= 128) return -1;
+  int signo = status - 128;
+  if (signo >= NSIG) return -1;
+  return signo;
 }
 
-static int ExitStatusToSignalNumber(int status) {
-  assert(IsSignalExit(status));
-  return status - 128;
+static bool IsSignalExit(int status) {
+  int signo = ExitStatusToSignalNumber(status);
+  return signo != -1;
 }
 
 static bool IsNormalExit(int status) {
@@ -267,9 +273,49 @@ static const char *CExitToString(int exit_code) {
   return NULL;
 }
 
+// sig2str is defined by POSIX, but not implemented (yet) on MacOS.
+// https://pubs.opengroup.org/onlinepubs/9799919799/functions/sig2str.html
+#ifdef __APPLE__
+// Just guessing what the max signal name length is.
+#define SIG2STR_MAX 64
+
+int sig2str(int signum, char *str) {
+  if (signum >= NSIG) return -1;
+  strcpy(str, sys_signame[signum]);
+  return 0;
+}
+#endif
+
+// Converts the string *in-place* to uppercase.
+void Uppercase(char *str) {
+  while (*str != '\0') {
+    int c = toupper(*str);
+    *str = c;
+    ++str;
+  }
+}
+
+// The return value must be freed.
+__attribute__((malloc))
+static char *SignalExitToString(int exit_status) {
+  int signum = ExitStatusToSignalNumber(exit_status);
+  if (signum == -1) return NULL;
+
+  char abbrev[SIG2STR_MAX];
+  if (sig2str(signum, abbrev) == -1) return NULL;
+  Uppercase(abbrev);
+  const char *descr = strsignal(signum);
+  char *ret = NULL;
+  int rc = asprintf(&ret, "SIG%s: %s", abbrev, descr);
+  if (rc == -1) err(EX_SOFTWARE, "asprintf");
+  return ret;
+}
+
 static void PrintExitStatusNameOrDie(int status) {
-  if (IsSignalExit(status)) {
-    psignal(ExitStatusToSignalNumber(status), "Signal");
+  char *sigmsg = SignalExitToString(status);
+  if (sigmsg != NULL) {
+    PrintfOrDie("%s\n", sigmsg);
+    free(sigmsg);
     return;
   }
 

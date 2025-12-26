@@ -1,5 +1,7 @@
 .PHONY: all clean test
 
+CFLAGS := -Wall -Werror -Wextra
+
 all: dexit
 
 clean:
@@ -9,4 +11,4 @@ test: dexit
 	./tests.sh
 
 %: %.c
-	$(CC) -Wall -Werror -Wextra -o $@ $<
+	$(CC) $(CFLAGS) -o $@ $<

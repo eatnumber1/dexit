@@ -17,7 +17,7 @@ It can also be used as a way to test for various kinds of errors.
  - Signals
    ```
    $ bash -c 'kill -TERM $$'; dexit $?
-   Signal: Terminated
+   SIGTERM: Terminated: 15
    ```
  - [sysexits.h]
    ```
@@ -30,6 +30,11 @@ It can also be used as a way to test for various kinds of errors.
    $ SHELL=/bin/bash /bin/bash -c 'asdf; dexit $?'
    /bin/bash: asdf: command not found
    bash: command not found
+   ```
+ - Unknown exit codes are just printed
+   ```
+   $ dexit 3
+   3
    ```
 
 ## Testing for Error Kinds
