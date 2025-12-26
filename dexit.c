@@ -43,7 +43,7 @@ static void PrintfOrDie(const char *format, ...) {
 }
 
 __attribute__((noreturn))
-static void usage_and_die(FILE *out, int exit_status) {
+static void UsageAndDie(FILE *out, int exit_status) {
   // glibc's program_invocation_short_name, or BSD's getprogname() would be
   // nicer than argv0, but not worth the code complexity to use since they're
   // not portable. gnulib has a portable implementation, but isn't worth taking
@@ -127,7 +127,7 @@ static Flags ParseFlagsOrDie(int *argc, char **argv[]) {
     if (c == -1) break;
     switch (c) {
     case 'h':
-      usage_and_die(stdout, EXIT_SUCCESS);
+      UsageAndDie(stdout, EXIT_SUCCESS);
     case 's':
       flags.if_signaled = true;
       break;
@@ -144,7 +144,7 @@ static Flags ParseFlagsOrDie(int *argc, char **argv[]) {
       flags.name = true;
       break;
     case '?':
-      usage_and_die(stderr, EX_USAGE);
+      UsageAndDie(stderr, EX_USAGE);
     default:
       FPrintfOrDie(stderr, "?? getopt return character code 0%o ??\n", c);
       exit(EX_SOFTWARE);
@@ -366,7 +366,7 @@ int main(int argc, char *argv[]) {
 
   if (argc != 1) {
     FPrintfOrDie(stderr, "Must provide the exit status as the sole non-flag argument\n");
-    usage_and_die(stderr, EX_USAGE);
+    UsageAndDie(stderr, EX_USAGE);
   }
   int status = AtoIOrDie(argv[0]);
 
