@@ -5,21 +5,21 @@
 #define _GNU_SOURCE
 #include <assert.h>
 #include <ctype.h>
-#include <libgen.h>
-#include <string.h>
 #include <ctype.h>
 #include <err.h>
 #include <errno.h>
 #include <getopt.h>
+#include <libgen.h>
 #include <limits.h>
 #include <signal.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <sysexits.h>
-#include <stdarg.h>
 
 static const char *argv0 = NULL;
 
