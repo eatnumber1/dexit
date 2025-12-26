@@ -8,44 +8,44 @@ It can also be used as a way to test for various kinds of errors.
 ## Generating Error Messages
 
  - C (`EXIT_SUCCESS` and `EXIT_FAILURE`)
-   ```
+   ```sh
    $ true; dexit $?
    EXIT_SUCCESS
    $ false; dexit $?
    EXIT_FAILURE
    ```
  - Signals
-   ```
+   ```sh
    $ bash -c 'kill -TERM $$'; dexit $?
    SIGTERM: Terminated: 15
    ```
  - [sysexits.h]
-   ```
+   ```sh
    $ python -c 'import os; import sys; sys.exit(os.EX_OSERR);'; dexit $?
    EX_OSERR: system error (e.g. can't fork)
    ```
  - [Bash](https://www.gnu.org/software/bash/manual/bash.html#Exit-Status) (exit
    codes 126 and 127)
-   ```
+   ```sh
    $ SHELL=/bin/bash /bin/bash -c 'asdf; dexit $?'
    /bin/bash: asdf: command not found
    bash: command not found
    ```
  - Unknown exit codes are just printed
-   ```
+   ```sh
    $ dexit 3
    3
    ```
 
 ## Testing for Error Kinds
 
-```
+```sh
 $ bash -c 'kill -TERM $$'
 $ dexit -s $? && echo 'Died due to signal'
 Died due to signal
 ```
 
-```
+```sh
 $ bash -c 'exit 1'
 $ dexit -e $? && echo 'Died due to regular exit'
 Died due to regular exit
@@ -90,6 +90,24 @@ Environment:
 
 Author: Russell Harmon <russ@har.mn>
 License: MIT
+```
+
+# Tip
+
+Use dexit in your shell scripts as a wrapper around `exit $?` to get better
+errors. Here's how to do it in bash:
+
+```bash
+# Usage: dexit <exit status>
+function dexit {
+  local rc=$?
+  [[ $# -eq 1 ]] && rc="$1"
+  [[ $# -le 1 ]] || exit 1  # dexit flags not supported
+  command dexit "$rc"
+  exit "$rc"
+}
+
+command_that_may_fail || dexit
 ```
 
 [sysexits.h]: https://www.man7.org/linux/man-pages/man3/sysexits.h.3head.html
