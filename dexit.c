@@ -52,6 +52,8 @@ static void UsageAndDie(FILE *out, int exit_status) {
     out,
     "Usage: %s [options] <exit status>\n"
     "\n"
+    "dexit decodes exit statuses produced by your shell\n"
+    "\n"
     "Tests:\n"
     "  -s, --if-signaled    Check whether the program died due to a signal.\n"
     "  -e, --if-exited      Check whether the program died due to a 'normal'\n"
