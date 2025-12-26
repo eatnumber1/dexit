@@ -375,14 +375,17 @@ int main(int argc, char *argv[]) {
 
   if (flags.if_exited) {
     return IsNormalExit(status) ? EXIT_SUCCESS : EXIT_FAILURE;
-  } else if (flags.if_signaled) {
+  }
+  if (flags.if_signaled) {
     return IsSignalExit(status) ? EXIT_SUCCESS : EXIT_FAILURE;
-  } else if (flags.signal_number) {
+  }
+  if (flags.signal_number) {
     if (!IsSignalExit(status)) return EXIT_FAILURE;
     int signum = ExitStatusToSignalNumber(status);
     PrintfOrDie("%d\n", signum);
     return EXIT_SUCCESS;
-  } else if (flags.exit_number) {
+  }
+  if (flags.exit_number) {
     if (!IsNormalExit(status)) return EXIT_FAILURE;
     PrintfOrDie("%d\n", status);
     return EXIT_SUCCESS;
