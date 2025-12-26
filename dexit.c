@@ -273,11 +273,14 @@ static const char *CExitToString(int exit_code) {
   return NULL;
 }
 
+#ifndef SIG2STR_MAX
+// Just guessing what the max signal name length is.
+#define SIG2STR_MAX 64
+#endif  // SIG2STR_MAX
+
 // sig2str is defined by POSIX, but not implemented (yet) on MacOS.
 // https://pubs.opengroup.org/onlinepubs/9799919799/functions/sig2str.html
 #ifdef __APPLE__
-// Just guessing what the max signal name length is.
-#define SIG2STR_MAX 64
 
 int sig2str(int signum, char *str) {
   if (signum >= NSIG) return -1;
