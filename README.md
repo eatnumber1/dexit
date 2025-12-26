@@ -1,0 +1,90 @@
+# dexit: Decode Exit
+
+dexit is a small program meant to be used to decode shell exit codes ($? in most
+shells) into readable error messages.
+
+It can also be used as a way to test for various kinds of errors.
+
+## Generating Error Messages
+
+ - C (`EXIT_SUCCESS` and `EXIT_FAILURE`)
+   ```
+   $ true; dexit $?
+   EXIT_SUCCESS
+   $ false; dexit $?
+   EXIT_FAILURE
+   ```
+ - Signals
+   ```
+   $ bash -c 'kill -TERM $$'; dexit $?
+   Signal: Terminated
+   ```
+ - [sysexits.h]
+   ```
+   $ python -c 'import os; import sys; sys.exit(os.EX_OSERR);'; dexit $?
+   EX_OSERR: system error (e.g. can't fork)
+   ```
+ - [Bash](https://www.gnu.org/software/bash/manual/bash.html#Exit-Status) (exit
+   codes 126 and 127)
+   ```
+   $ SHELL=/bin/bash /bin/bash -c 'asdf; dexit $?'
+   /bin/bash: asdf: command not found
+   bash: command not found
+   ```
+
+## Testing for Error Kinds
+
+```
+$ bash -c 'kill -TERM $$'
+$ dexit -s $? && echo 'Died due to signal'
+Died due to signal
+```
+
+```
+$ bash -c 'exit 1'
+$ dexit -e $? && echo 'Died due to regular exit'
+Died due to regular exit
+```
+
+## Usage
+
+```
+Usage: dexit [options] <exit status>
+
+Tests:
+  -s, --if-signaled    Check whether the program died due to a signal.
+  -e, --if-exited      Check whether the program died due to a 'normal'
+                       exit (e.g. return from main or call to exit(3) or
+                       _exit(2)).
+
+Decoding:
+  -g, --signal-number  Retrieve the signal number from the exit status.
+  -x, --exit-number    Retrieve the exit number from the exit status.
+  -n, --name           Decode the exit status to a name (where
+                       possible). This is the default behavior.
+
+  The flags -g and -x will cause dexit to exit with an EX_USAGE error if
+  the program did not exit due to a signal or normal exit respectively.
+
+  The flag -n (default) will decode signal exit codes into their signal
+  name, 0 or 1 into EXIT_SUCCESS or EXIT_FAILURE respectively, and
+  sysexits.h error codes where defined. Otherwise it will produce the
+  exit number.
+
+Other flags:
+  -h, --help           This help text.
+
+Arguments:
+  exit status - The exit status returned from a call to wait(2) (which
+                is $? on many shells)
+
+Environment:
+  SHELL - if the shell is bash, the bash-specific error codes 126 and 127
+          are decoded as 'command not executable' and 'command not found'
+          respectively
+
+Author: Russell Harmon <russ@har.mn>
+License: MIT
+```
+
+[sysexits.h]: https://www.man7.org/linux/man-pages/man3/sysexits.h.3head.html
