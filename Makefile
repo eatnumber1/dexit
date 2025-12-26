@@ -12,7 +12,7 @@ test: dexit
 
 # Helpful to view all the exit codes.
 print: dexit
-	seq 0 255 | parallel --keep-order -j0 --tag -- SHELL=bash ./dexit
+	seq 0 255 | parallel --keep-order -j100 --tag -- SHELL=bash ./dexit
 
 %: %.c
 	$(CC) $(CFLAGS) -o $@ $<
