@@ -83,13 +83,12 @@ Other flags:
   -h, --help           This help text.
 
 Arguments:
-  exit status - The exit status returned from a call to wait(2) (which
-                is $? on many shells)
+  exit status - The exit status from your shell (which is $? on many shells).
 
 Environment:
   SHELL - if the shell is bash, the bash-specific error codes 126 and 127
           are decoded as 'command not executable' and 'command not found'
-          respectively
+          respectively.
 
 Author: Russell Harmon <russ@har.mn>
 License: MIT
