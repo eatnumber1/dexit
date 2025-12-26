@@ -278,16 +278,21 @@ static const char *CExitToString(int exit_code) {
 #define SIG2STR_MAX 64
 #endif  // SIG2STR_MAX
 
-// sig2str is defined by POSIX, but not implemented (yet) on MacOS.
+// sig2str is defined by POSIX, but not implemented (yet) on MacOS or glibc.
 // https://pubs.opengroup.org/onlinepubs/9799919799/functions/sig2str.html
-#ifdef __APPLE__
-
+#if defined(__APPLE__)
 int sig2str(int signum, char *str) {
   if (signum >= NSIG) return -1;
   strcpy(str, sys_signame[signum]);
   return 0;
 }
-#endif
+#elif defined(__GLIBC__)
+int sig2str(int signum, char *str) {
+  if (signum >= NSIG) return -1;
+  strcpy(str, sigabbrev_np(signum));
+  return 0;
+}
+#endif  // defined(__APPLE__) || defined(__GLIBC__)
 
 // Converts the string *in-place* to uppercase.
 void Uppercase(char *str) {
