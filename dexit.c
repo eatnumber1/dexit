@@ -288,8 +288,18 @@ int sig2str(int signum, char *str) {
 }
 #elif defined(__GLIBC__)
 int sig2str(int signum, char *str) {
+  if (signum >= NSIG) return -1;
+  // The realtime signals are not supported by sigabbrev_np, so we emulate them.
+  // SIGRTMIN and SIGRTMAX are runtime-determined, however the support in
+  // sigabbrev_np is compile-time decided. So instead we use glibc's internal
+  // __SIGRTMIN and __SIGRTMAX which are the limits of SIGRTMIN/SIGRTMAX and
+  // are what sigabbrev_np uses.
+  if (signum >= __SIGRTMIN && signum <= __SIGRTMAX) {
+    sprintf(str, "SIGRTMIN+%d", signum - __SIGRTMIN);
+    return 0;
+  }
   const char *abbrev = sigabbrev_np(signum);
-  if (abbrev == NULL) return -1;
+  assert(abbrev != NULL);
   strcpy(str, abbrev);
   return 0;
 }
