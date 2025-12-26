@@ -1,11 +1,14 @@
 # dexit: Decode Exit
 
-dexit is a small program meant to be used to decode shell exit codes ($? in most
-shells) into readable error messages.
+dexit is a small program meant to be used to decode shell exit codes (`$?` in
+most shells) into readable error messages.
 
 It can also be used as a way to test for various kinds of errors.
 
 ## Generating Error Messages
+
+There are several different kinds of error codes. `dexit` supports the
+following:
 
  - C (`EXIT_SUCCESS` and `EXIT_FAILURE`)
    ```sh
@@ -19,13 +22,13 @@ It can also be used as a way to test for various kinds of errors.
    $ bash -c 'kill -TERM $$'; dexit $?
    SIGTERM: Terminated: 15
    ```
- - [sysexits.h]
+ - [`sysexits.h`]
    ```sh
    $ python -c 'import os; import sys; sys.exit(os.EX_OSERR);'; dexit $?
    EX_OSERR: system error (e.g. can't fork)
    ```
- - [Bash](https://www.gnu.org/software/bash/manual/bash.html#Exit-Status) (exit
-   codes 126 and 127)
+ - Bash ([exit codes 126 and
+   127](https://www.gnu.org/software/bash/manual/bash.html#Exit-Status))
    ```sh
    $ SHELL=/bin/bash /bin/bash -c 'asdf; dexit $?'
    /bin/bash: asdf: command not found
