@@ -112,4 +112,6 @@ function dexit {
 command_that_may_fail || dexit
 ```
 
+A more comprehensive version for zsh can be found in [zdexit](zdexit).
+
 [`sysexits.h`]: https://www.man7.org/linux/man-pages/man3/sysexits.h.3head.html

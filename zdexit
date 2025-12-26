@@ -1,0 +1,23 @@
+#!/bin/zsh
+# Usage: zdexit [flags] [exit status] [message]...
+#
+# Install this in ~/.zsh/functions and load it with `autoload -Uz zdexit`.
+#
+local exstatus=$?
+
+local -a flags
+while [[ $# -ne 0 ]]; do
+  if ([[ "${1:0:1}" != "-" ]]) break
+  flags+=( "$1" )
+  shift
+done
+
+if [[ $# -ne 0 ]]; then
+  exstatus="$1"
+  shift
+fi
+
+if ([[ $# -ne 0 ]]) printf '%s: ' "$*"
+command dexit "${flags[@]}" "$exstatus" \
+  || echo "'dexit ${flags[*]} $exstatus' failed with status $?" >&2
+exit "$exstatus"
