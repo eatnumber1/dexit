@@ -288,8 +288,9 @@ int sig2str(int signum, char *str) {
 }
 #elif defined(__GLIBC__)
 int sig2str(int signum, char *str) {
-  if (signum >= NSIG) return -1;
-  strcpy(str, sigabbrev_np(signum));
+  const char *abbrev = sigabbrev_np(signum);
+  if (abbrev == NULL) return -1;
+  strcpy(str, abbrev);
   return 0;
 }
 #endif  // defined(__APPLE__) || defined(__GLIBC__)
