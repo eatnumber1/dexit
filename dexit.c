@@ -295,7 +295,7 @@ int sig2str(int signum, char *str) {
   // __SIGRTMIN and __SIGRTMAX which are the limits of SIGRTMIN/SIGRTMAX and
   // are what sigabbrev_np uses.
   if (signum >= __SIGRTMIN && signum <= __SIGRTMAX) {
-    sprintf(str, "SIGRTMIN+%d", signum - __SIGRTMIN);
+    sprintf(str, "RTMIN+%d", signum - __SIGRTMIN);
     return 0;
   }
   const char *abbrev = sigabbrev_np(signum);
