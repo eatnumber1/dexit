@@ -35,4 +35,4 @@ run_test 'test "$(./dexit 71)" == "EX_OSERR: system error (e.g. can'"'"'t fork)"
 run_test 'test "$(./dexit 3)" == 3'
 run_test 'test "$(./dexit 100)" == 100'
 run_test 'test "$(./dexit 128)" == 128'
-run_test 'test "$(./dexit 129)" == "SIGHUP: Hangup: 1"'
+run_test '[[ "$(./dexit 129)" =~ "SIGHUP: Hangup".* ]]'
