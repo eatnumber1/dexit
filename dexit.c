@@ -361,7 +361,7 @@ static void PrintExitStatusNameOrDie(int status) {
     return;
   }
 
-  PrintfOrDie("%d\n", status);
+  PrintfOrDie("exit code %d\n", status);
 }
 
 int main(int argc, char *argv[]) {

@@ -37,7 +37,7 @@ following:
  - Unknown exit codes are just printed
    ```sh
    $ dexit 3
-   3
+   exit code 3
    ```
 
 ## Testing for Error Kinds
