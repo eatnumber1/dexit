@@ -21,6 +21,14 @@
 #include <sys/wait.h>
 #include <sysexits.h>
 
+// SIG2STR_MAX is defined by POSIX, but not implemented (yet) on MacOS or
+// glibc.
+// https://pubs.opengroup.org/onlinepubs/9799919799/functions/sig2str.html
+#ifndef SIG2STR_MAX
+// Just guessing what the max signal name length is.
+#define SIG2STR_MAX 64
+#endif  // SIG2STR_MAX
+
 static const char *argv0 = NULL;
 
 static void VFPrintfOrDie(FILE *out, const char *format, va_list args) {
@@ -91,14 +99,13 @@ static void UsageAndDie(FILE *out, int exit_status) {
   exit(exit_status);
 }
 
-struct FlagsT {
+typedef struct FlagsT {
   bool if_signaled;
   bool if_exited;
   bool signal_number;
   bool exit_number;
   bool name;
-};
-typedef struct FlagsT Flags;
+} Flags;
 
 static Flags DefaultFlags() {
   Flags flags = {
@@ -274,11 +281,6 @@ static const char *CExitToString(int exit_code) {
   return NULL;
 }
 
-#ifndef SIG2STR_MAX
-// Just guessing what the max signal name length is.
-#define SIG2STR_MAX 64
-#endif  // SIG2STR_MAX
-
 // sig2str is defined by POSIX, but not implemented (yet) on MacOS or glibc.
 // https://pubs.opengroup.org/onlinepubs/9799919799/functions/sig2str.html
 #if defined(__APPLE__)
@@ -381,8 +383,8 @@ int main(int argc, char *argv[]) {
     return IsSignalExit(status) ? EXIT_SUCCESS : EXIT_FAILURE;
   }
   if (flags.signal_number) {
-    if (!IsSignalExit(status)) return EXIT_FAILURE;
     int signum = ExitStatusToSignalNumber(status);
+    if (signum == -1) return EXIT_FAILURE;
     PrintfOrDie("%d\n", signum);
     return EXIT_SUCCESS;
   }
