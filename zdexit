@@ -18,6 +18,6 @@ if [[ $# -ne 0 ]]; then
 fi
 
 if ([[ $# -ne 0 ]]) printf '%s: ' "$*"
-command dexit "${flags[@]}" "$exstatus" \
+dexit "${flags[@]}" "$exstatus" \
   || echo "'dexit ${flags[*]} $exstatus' failed with status $?" >&2
 exit "$exstatus"
